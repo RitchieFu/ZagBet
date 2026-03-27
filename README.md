@@ -1,3 +1,5 @@
 # ZagBet
 Not affiliated with Gonzaga
-Hello team!
+
+
+changes made by Jack
