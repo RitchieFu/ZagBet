@@ -1,0 +1,109 @@
+.site-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem 1rem;
+}
+
+.session-panel {
+  text-align: right;
+  font-size: 0.95rem;
+  line-height: 1.35;
+}
+
+.session-panel__name {
+  display: block;
+  font-weight: 600;
+  color: #1a1a1a;
+}
+
+.session-panel__balance {
+  display: block;
+  font-weight: 700;
+  color: #001f3f;
+}
+
+.zagbet-session-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  background: rgba(0, 0, 0, 0.45);
+}
+
+.zagbet-session-modal[hidden] {
+  display: none !important;
+}
+
+.zagbet-session-modal__card {
+  width: min(100%, 22rem);
+  padding: 1.5rem;
+  border-radius: 12px;
+  background: #fff;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.18);
+}
+
+.zagbet-session-modal__card h2 {
+  margin: 0 0 0.35rem;
+  font-size: 1.2rem;
+}
+
+.zagbet-session-modal__card p {
+  margin: 0 0 1rem;
+  font-size: 0.9rem;
+  color: #555;
+}
+
+.zagbet-session-modal__label {
+  display: block;
+  margin-bottom: 0.35rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.zagbet-session-modal__input {
+  width: 100%;
+  margin-bottom: 1rem;
+  padding: 0.6rem 0.75rem;
+  border: 2px solid #e0dcd6;
+  border-radius: 8px;
+  font: inherit;
+  box-sizing: border-box;
+}
+
+.zagbet-session-modal__input:focus-visible {
+  outline: 3px solid #001f3f;
+  outline-offset: 1px;
+}
+
+.zagbet-session-modal__error {
+  min-height: 1.25rem;
+  margin: 0 0 0.5rem;
+  font-size: 0.8rem;
+  color: #a01830;
+}
+
+.zagbet-session-modal__submit {
+  width: 100%;
+  padding: 0.65rem 1rem;
+  border: none;
+  border-radius: 8px;
+  background: #001f3f;
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.zagbet-session-modal__submit:hover {
+  background: #002952;
+}
+
+.zagbet-session-modal__submit:focus-visible {
+  outline: 3px solid #800020;
+  outline-offset: 2px;
+}

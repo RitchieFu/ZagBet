@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Cross the road — ZagBet</title>
+  <link rel="stylesheet" href="session.css">
   <style>
     * {
       box-sizing: border-box;
@@ -13,7 +14,7 @@
       min-height: 100vh;
       display: flex;
       flex-direction: column;
-      background: #f6f4f2;
+      background: #a1a9b6;
       font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
       color: #1a1a1a;
     }
@@ -73,6 +74,10 @@
 <body>
   <header class="site-header">
     <h1><span class="zag">Zag</span><span class="bet">Bet</span></h1>
+    <div class="session-panel" id="session-panel" hidden>
+      <span class="session-panel__name" id="session-player-name"></span>
+      <span class="session-panel__balance" id="session-balance"></span>
+    </div>
   </header>
 
   <div class="play-area">
@@ -81,15 +86,7 @@
 
   <button type="button" id="jump">Jump</button>
 
-  <script>
-    const duck = document.getElementById("duck");
-    const jumpBtn = document.getElementById("jump");
-    let forwardPx = 0;
-
-    jumpBtn.addEventListener("click", () => {
-      forwardPx += 200;
-      duck.style.transform = `translateX(${forwardPx}px)`;
-    });
-  </script>
+  <script type="module" src="session.js"></script>
+  <script type="module" src="crosstheroad.page.js"></script>
 </body>
 </html>

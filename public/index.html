@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0" >
   <title>ZagBet</title>
+  <link rel="stylesheet" href="session.css">
   <style>
     * {
       box-sizing: border-box;
@@ -14,7 +15,7 @@
       display: flex;
       flex-direction: column;
       font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
-      background: #f6f4f2;
+      background: #a1a9b6;
       color: #1a1a1a;
     }
     .site-header {
@@ -45,22 +46,45 @@
     }
     .module-card {
       display: flex;
-      align-items: center;
-      justify-content: center;
-      min-height: 12rem;
-      padding: 1.5rem;
+      flex-direction: column;
+      align-items: stretch;
+      min-height: 14rem;
+      padding: 1.25rem 1.25rem 1.5rem;
       background: #fff;
       border: 2px solid #e0dcd6;
       border-radius: 12px;
       text-decoration: none;
       color: inherit;
-      font-size: 1.25rem;
-      font-weight: 600;
       box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
       transition: border-color 0.15s ease, box-shadow 0.15s ease;
     }
+    .module-card__title {
+      font-size: clamp(1.5rem, 3vw, 1.85rem);
+      font-weight: 700;
+      line-height: 1.2;
+      letter-spacing: -0.02em;
+      flex-shrink: 0;
+    }
+    .module-card__photo {
+      flex: 1;
+      min-height: 7.5rem;
+      margin-top: 1rem;
+      border-radius: 8px;
+      position: relative;
+      overflow: hidden;
+      background: #f0ece6;
+    }
+    .module-card__photo img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center;
+      display: block;
+    }
     .module-card:hover {
-      border-color: #c4bdb3;
+      border-color: #800020;
       box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
     }
     .module-card:focus-visible {
@@ -72,7 +96,10 @@
         grid-template-columns: 1fr;
       }
       .module-card {
-        min-height: 10rem;
+        min-height: 13rem;
+      }
+      .module-card__photo {
+        min-height: 6.5rem;
       }
     }
   </style>
@@ -80,11 +107,25 @@
 <body>
   <header class="site-header">
     <h1><span class="zag">Zag</span><span class="bet">Bet</span></h1>
+    <div class="session-panel" id="session-panel" hidden>
+      <span class="session-panel__name" id="session-player-name"></span>
+      <span class="session-panel__balance" id="session-balance"></span>
+    </div>
   </header>
   <main class="game-modules">
-    <a class="module-card" href="#">HiLo</a>
-    <a class="module-card" href="#">Cross The Road</a>
-    <a class="module-card" href="#">Mines</a>
+    <a class="module-card" href="#">
+      <span class="module-card__title">HiLo</span>
+      <div class="module-card__photo"></div>
+    </a>
+    <a class="module-card" href="crosstheroad.html">
+      <span class="module-card__title">Cross The Road</span>
+      <div class="module-card__photo"><img id="cross_the_road_cover" src="media/cross_the_road_cover.jpg" alt="Duck On the Street"></div>
+    </a>
+    <a class="module-card" href="#">
+      <span class="module-card__title">Mines</span>
+      <div class="module-card__photo"></div>
+    </a>
   </main>
+  <script type="module" src="session.js"></script>
 </body>
 </html>
