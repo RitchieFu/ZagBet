@@ -10,7 +10,7 @@ on:
       - "package-lock.json"
       - ".github/workflows/**"
       - "README.md"
-      - "index.html"
+      - "public/**"
   push:
     branches:
       - main
@@ -49,4 +49,4 @@ jobs:
         run: npm run build
 
       - name: Validate HTML
-        run: npx html-validate index.html
+        run: npx html-validate public/**/*.html
