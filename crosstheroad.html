@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cross the road — ZagBet</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      background: #f6f4f2;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+      color: #1a1a1a;
+    }
+    .site-header {
+      padding: 1.25rem 1.5rem;
+      flex-shrink: 0;
+    }
+    .site-header h1 {
+      margin: 0;
+      font-size: clamp(1.75rem, 4vw, 2.5rem);
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      line-height: 1.05;
+    }
+    .zag {
+      color: #800020;
+    }
+    .bet {
+      color: #001f3f;
+    }
+    .play-area {
+      flex: 1;
+      position: relative;
+      min-height: 0;
+    }
+    #duck {
+      position: absolute;
+      left: 1.5rem;
+      bottom: 5.5rem;
+      max-height: 96px;
+      width: auto;
+      display: block;
+      transition: transform 0.2s ease-out;
+    }
+    #jump {
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      padding: 1rem 1.5rem;
+      border: none;
+      background: #c41e3a;
+      color: #fff;
+      font-size: 1.125rem;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    #jump:hover {
+      background: #a01830;
+    }
+    #jump:focus-visible {
+      outline: 3px solid #001f3f;
+      outline-offset: -3px;
+    }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <h1><span class="zag">Zag</span><span class="bet">Bet</span></h1>
+  </header>
+
+  <div class="play-area">
+    <img id="duck" src="media/duck.png" alt="Duck" />
+  </div>
+
+  <button type="button" id="jump">Jump</button>
+
+  <script>
+    const duck = document.getElementById("duck");
+    const jumpBtn = document.getElementById("jump");
+    let forwardPx = 0;
+
+    jumpBtn.addEventListener("click", () => {
+      forwardPx += 200;
+      duck.style.transform = `translateX(${forwardPx}px)`;
+    });
+  </script>
+</body>
+</html>

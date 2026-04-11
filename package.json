@@ -7,6 +7,7 @@
     "lint": "find src test -name '*.js' -print0 | xargs -0 -n1 node --check",
     "test": "node --test",
     "build": "node scripts/build.mjs",
-    "play": "node bin/play.mjs"
+    "play": "node bin/play.mjs",
+    "play:crosstheroad": "node bin/playcrosstheroad.mjs"
   }
 }

@@ -11,9 +11,9 @@ export const games = [
   {
     id: "cross-the-road",
     name: "Cross the Road",
-    status: "planned",
-    description: "Reserved for a teammate to implement later.",
-    entrypoint: null,
+    status: "active",
+    description: "Crossing the road game with random speeding cars",
+    entrypoint: "src/games/crosstheroad.js",
   },
   {
     id: "mines",
