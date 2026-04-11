@@ -10,7 +10,7 @@ on:
       - "package-lock.json"
       - ".github/workflows/**"
       - "README.md"
-      - "local.html"
+      - "index.html"
   push:
     branches:
       - main
