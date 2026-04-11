@@ -9,5 +9,8 @@
     "build": "node scripts/build.mjs",
     "play": "node bin/play.mjs",
     "play:crosstheroad": "node bin/playcrosstheroad.mjs"
+  },
+  "devDependencies": {
+    "html-validate": "^10.11.3"
   }
 }

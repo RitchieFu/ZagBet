@@ -22,6 +22,7 @@ on:
       - "package-lock.json"
       - ".github/workflows/**"
       - "README.md"
+      - "public/**"
 
 jobs:
   validate:
@@ -49,4 +50,4 @@ jobs:
         run: npm run build
 
       - name: Validate HTML
-        run: npx html-validate public/**/*.html
+        run: npx html-validate public/*.html
