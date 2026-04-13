@@ -24,4 +24,29 @@ function initMinesLayout() {
   }
 }
 
+function initBetAmountField() {
+  const bet = document.getElementById("bet-amount");
+  if (!bet) return;
+
+  bet.addEventListener("input", () => {
+    const v = bet.valueAsNumber;
+    if (Number.isFinite(v) && v < 0) bet.value = "0";
+  });
+
+  bet.addEventListener("blur", () => {
+    const raw = bet.value.trim();
+    if (raw === "") {
+      bet.value = "0.00";
+      return;
+    }
+    const v = Number.parseFloat(raw);
+    if (!Number.isFinite(v) || v < 0) {
+      bet.value = "0.00";
+      return;
+    }
+    bet.value = v.toFixed(2);
+  });
+}
+
 initMinesLayout();
+initBetAmountField();
