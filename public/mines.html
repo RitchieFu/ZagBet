@@ -83,6 +83,41 @@
       border-radius: 4px;
       border: 2px solid #5a6270;
       background: #c8cdd6;
+      transition: opacity 0.4s ease, background-color 0.35s ease, border-color 0.35s ease;
+    }
+    .mines-cell--fade-mine {
+      opacity: 0;
+      background-color: #c41e3a;
+      border-color: #800020;
+    }
+    .mines-cell--fade-mine.mines-cell--fade-mine-visible {
+      opacity: 1;
+    }
+    .mines-cell--fade-safe {
+      opacity: 0;
+      background-color: #2e7d32;
+      border-color: #1b5e20;
+    }
+    .mines-cell--fade-safe.mines-cell--fade-safe-visible {
+      opacity: 1;
+    }
+    .mines-grid--active .mines-cell:not(.mines-cell--revealed-safe):not(.mines-cell--revealed-mine) {
+      cursor: pointer;
+    }
+    .mines-grid--active .mines-cell:not(.mines-cell--revealed-safe):not(.mines-cell--revealed-mine):hover {
+      filter: brightness(1.06);
+    }
+    .mines-cell--revealed-safe {
+      background: #2e7d32;
+      border-color: #1b5e20;
+    }
+    .mines-cell--revealed-mine {
+      background: #c41e3a;
+      border-color: #800020;
+    }
+    .mines-grid--blocked .mines-cell {
+      pointer-events: none;
+      cursor: default;
     }
     .mines-bet-row {
       display: flex;
@@ -130,6 +165,15 @@
       outline: 3px solid #001f3f;
       outline-offset: 2px;
     }
+    .mines-bet-row button.mines-bet-row__btn--cashout {
+      background: #2e7d32;
+    }
+    .mines-bet-row button.mines-bet-row__btn--cashout:hover {
+      background: #1b5e20;
+    }
+    .mines-bet-row button.mines-bet-row__btn--cashout:focus-visible {
+      outline-color: #800020;
+    }
     .mines-bet-error {
       align-self: stretch;
       margin: 0;
@@ -166,10 +210,10 @@
       </div>
     </div>
 
-    <div class="mines-grid" role="grid" aria-label="Mines game board"></div>
+    <div class="mines-grid" id="mines-grid" role="grid" aria-label="Mines game board"></div>
 
     <div class="mines-bet-row">
-      <label class="mines-bet-row__label" for="bet-amount">Bet amount:</label>
+      <label class="mines-bet-row__label" id="mines-bet-label" for="bet-amount">Bet amount:</label>
       <input
         id="bet-amount"
         name="bet-amount"
