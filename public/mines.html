@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mines — ZagBet</title>
+  <link rel="stylesheet" href="session.css">
+  <link rel="stylesheet" href="site.css">
+  <style>
+    .play-area {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+    }
+    .mines-panel {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.25rem;
+      width: min(100%, 22rem);
+    }
+    .mines-controls {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+    .mines-controls label {
+      font-weight: 600;
+    }
+    .mines-controls select {
+      min-width: 5rem;
+      padding: 0.35rem 0.5rem;
+      font-size: 1rem;
+      border: 1px solid #5a6270;
+      border-radius: 4px;
+      background: #fff;
+    }
+    .mines-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      grid-template-rows: repeat(5, 1fr);
+      gap: 4px;
+      width: min(100%, 20rem);
+      aspect-ratio: 1;
+    }
+    .mines-cell {
+      min-height: 0;
+      min-width: 0;
+      border-radius: 4px;
+      border: 2px solid #5a6270;
+      background: #c8cdd6;
+    }
+    .mines-bet-row {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      width: 100%;
+    }
+    .mines-bet-row input[type="number"] {
+      flex: 1;
+      min-width: 0;
+      padding: 0.5rem 0.65rem;
+      font-size: 1rem;
+      border: 1px solid #5a6270;
+      border-radius: 4px;
+    }
+    .mines-bet-row button {
+      flex-shrink: 0;
+      padding: 0.5rem 1.25rem;
+      font-size: 1rem;
+      font-weight: 700;
+      border: none;
+      border-radius: 4px;
+      background: #c41e3a;
+      color: #fff;
+      cursor: pointer;
+    }
+    .mines-bet-row button:hover {
+      background: #a01830;
+    }
+    .mines-bet-row button:focus-visible {
+      outline: 3px solid #001f3f;
+      outline-offset: 2px;
+    }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <h1><a class="site-header__logo" href="index.html"><span class="zag">Zag</span><span class="bet">Bet</span></a></h1>
+    <div class="session-panel" id="session-panel" hidden>
+      <span class="session-panel__name" id="session-player-name"></span>
+      <span class="session-panel__balance" id="session-balance"></span>
+    </div>
+  </header>
+
+  <div class="play-area">
+  <div class="mines-panel">
+    <div class="mines-controls">
+      <label for="mine-count">Mines</label>
+      <select id="mine-count" name="mine-count" aria-label="Number of mines"></select>
+    </div>
+
+    <div class="mines-grid" role="grid" aria-label="Mines game board"></div>
+
+    <div class="mines-bet-row">
+      <input
+        id="bet-amount"
+        name="bet-amount"
+        type="number"
+        min="0"
+        step="any"
+        value="0"
+        inputmode="decimal"
+        placeholder="Bet amount"
+        aria-label="Bet amount"
+      >
+      <button type="button">BET</button>
+    </div>
+  </div>
+  </div>
+
+  <script type="module" src="session.js"></script>
+  <script type="module" src="mines.page.js"></script>
+</body>
+</html>
