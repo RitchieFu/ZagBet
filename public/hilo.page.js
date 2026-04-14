@@ -1,7 +1,7 @@
 /**
  * HiLo game UI for browser play with betting.
  */
-import { resolveHiLoRound, getCardLabel } from "./games/hilo.js";
+import { resolveHiLoRound, getCardLabel, calculateStepMultiplier, calculateCumulativeMultiplier, buildExitWarningMessage, shouldConfirmExit, shouldBlockExitUntilCashout } from "./games/hilo.js";
 
 const currentCardEl = document.getElementById("current-card");
 const nextCardEl = document.getElementById("next-card");
@@ -45,25 +45,14 @@ let gameState = {
   gameActive: false,
   currentBet: 0,
   currentWinnings: 0,
-  multiplier: 1.0,
+  stepMultiplier: 1.0,
+  cumulativeMultiplier: 1.0,
+  stepResults: [],
   waitingForBet: false,
 };
 
-/** Calculate odds for a given card and guess direction */
-function calculateOdds(card, guess) {
-  if (card < 1 || card > 13) return 0;
-  
-  let winChance;
-  if (guess === "higher") {
-    winChance = (13 - card) / 13;
-  } else {
-    winChance = (card - 1) / 13;
-  }
-  
-  // Payout is 1 / probability, with house edge
-  if (winChance === 0) return 0;
-  const payout = 1 / winChance * 0.98; // 2% house edge
-  return payout;
+function buildRemainingDeck(currentCard) {
+  return Array.from({ length: 13 }, (_, index) => index + 1).filter((card) => card !== currentCard);
 }
 
 /** Generate a random card value from 1 to 13 */
@@ -83,6 +72,22 @@ function formatMultiplier(mult) {
   return mult.toFixed(2) + "x";
 }
 
+function updateGuessButtons() {
+  const canGuess = gameState.gameActive && gameState.currentCard !== null;
+  btnHigherEl.disabled = !canGuess || gameState.currentCard === 13;
+  btnLowerEl.disabled = !canGuess || gameState.currentCard === 1;
+}
+
+function syncEconomics() {
+  gameState.cumulativeMultiplier = calculateCumulativeMultiplier(gameState.stepResults);
+  gameState.stepMultiplier = gameState.stepResults.length > 0
+    ? gameState.stepResults[gameState.stepResults.length - 1].stepMultiplier
+    : 1.0;
+  gameState.currentWinnings = gameState.stepResults.length > 0
+    ? gameState.currentBet * gameState.cumulativeMultiplier
+    : 0;
+}
+
 /** Update the game display */
 function updateDisplay() {
   if (gameState.currentCard !== null) {
@@ -95,9 +100,13 @@ function updateDisplay() {
   
   roundInfoEl.textContent = `Round ${gameState.roundNumber}`;
   streakInfoEl.textContent = gameState.streak > 0 ? `Streak: ${gameState.streak}` : "";
+
+  const displayedMultiplier = gameState.gameActive && (gameState.currentCard === 1 || gameState.currentCard === 13)
+    ? 0
+    : gameState.cumulativeMultiplier;
   
   currentBetEl.textContent = formatUsd(gameState.currentBet);
-  multiplierEl.textContent = formatMultiplier(gameState.multiplier);
+  multiplierEl.textContent = formatMultiplier(displayedMultiplier);
   currentWinningsEl.textContent = formatUsd(gameState.currentWinnings);
 }
 
@@ -151,7 +160,9 @@ function handlePlaceBet() {
   // Set game state
   gameState.currentBet = amount;
   gameState.currentWinnings = 0;
-  gameState.multiplier = 1.0;
+  gameState.stepMultiplier = 1.0;
+  gameState.cumulativeMultiplier = 1.0;
+  gameState.stepResults = [];
   gameState.roundNumber = 1;
   gameState.streak = 0;
   
@@ -175,17 +186,18 @@ function startRound() {
   gameState.currentCard = drawCard();
   gameState.nextCard = drawDifferentCard(gameState.currentCard);
   gameState.gameActive = true;
+  gameState.stepResults = [];
+  syncEconomics();
   resultMessageEl.textContent = "";
   resultMessageEl.className = "";
   
   nextCardEl.textContent = "?";
   dividerEl.classList.add("hidden");
   nextCardEl.classList.add("hidden");
-  btnHigherEl.disabled = false;
-  btnLowerEl.disabled = false;
   btnNextEl.classList.add("hidden");
   btnCashoutEl.classList.add("hidden");
   guessButtonsEl.style.opacity = "1";
+  updateGuessButtons();
   
   updateDisplay();
 }
@@ -198,6 +210,7 @@ function handleGuess(guess) {
   
   const result = resolveHiLoRound(gameState.currentCard, gameState.nextCard, guess);
   gameState.gameActive = false;
+  updateGuessButtons();
   
   // Update display
   nextCardEl.textContent = getCardLabel(gameState.nextCard);
@@ -205,37 +218,41 @@ function handleGuess(guess) {
     nextCardEl.classList.remove("hidden");
   
   // Calculate winnings for this round
-  let roundWinnings = 0;
   if (result.result === "win") {
     gameState.streak++;
-    const odds = calculateOdds(gameState.currentCard, guess);
-    gameState.multiplier = Math.pow(odds, gameState.streak);
-    roundWinnings = gameState.currentBet * gameState.multiplier;
-    gameState.currentWinnings = roundWinnings;
+    const remainingDeck = buildRemainingDeck(gameState.currentCard);
+    const stepMultiplier = calculateStepMultiplier(gameState.currentCard, guess, remainingDeck);
+    gameState.stepResults.push({
+      currentCard: gameState.currentCard,
+      guess,
+      stepMultiplier,
+    });
+    syncEconomics();
     resultMessageEl.textContent = "✓ Correct!";
     resultMessageEl.className = "win";
   } else if (result.result === "lose") {
     resultMessageEl.textContent = "✗ Wrong! Game Over.";
     resultMessageEl.className = "lose";
     gameState.streak = 0;
-    gameState.multiplier = 0;
+    gameState.stepMultiplier = 0;
+    gameState.cumulativeMultiplier = 0;
     gameState.currentWinnings = 0;
   } else if (result.result === "push") {
      // Auto-draw new cards instead of asking user to retry
      gameState.currentCard = gameState.nextCard;
      gameState.nextCard = drawDifferentCard(gameState.currentCard);
      gameState.gameActive = true;
+     updateGuessButtons();
      resultMessageEl.textContent = "";
      resultMessageEl.className = "";
      nextCardEl.textContent = "?";
      dividerEl.classList.add("hidden");
      nextCardEl.classList.add("hidden");
     
-     btnHigherEl.disabled = false;
-     btnLowerEl.disabled = false;
      btnNextEl.classList.add("hidden");
      btnCashoutEl.classList.add("hidden");
     
+     syncEconomics();
      updateDisplay();
      return;
   }
@@ -243,8 +260,7 @@ function handleGuess(guess) {
   updateDisplay();
   
   // Disable guess buttons and show next button or end game
-  btnHigherEl.disabled = true;
-  btnLowerEl.disabled = true;
+  updateGuessButtons();
   
   if (result.result === "win") {
     // Show continue options
@@ -278,7 +294,9 @@ function handleCashout() {
   // Reset game state and show bet modal for new game
   gameState.currentBet = 0;
   gameState.currentWinnings = 0;
-  gameState.multiplier = 1.0;
+  gameState.stepMultiplier = 1.0;
+  gameState.cumulativeMultiplier = 1.0;
+  gameState.stepResults = [];
   gameState.roundNumber = 1;
   gameState.streak = 0;
   gameState.gameActive = false;
@@ -287,8 +305,7 @@ function handleCashout() {
   nextCardEl.textContent = "?";
     dividerEl.classList.add("hidden");
     nextCardEl.classList.add("hidden");
-  btnHigherEl.disabled = true;
-  btnLowerEl.disabled = true;
+  updateGuessButtons();
   btnNextEl.classList.add("hidden");
   btnCashoutEl.classList.add("hidden");
   
@@ -302,7 +319,7 @@ function handleCashout() {
 function handleNext() {
   if (gameState.currentBet === 0) return;
   
-  if (gameState.multiplier === 0) {
+  if (!gameState.gameActive && gameState.currentWinnings === 0) {
     // Lost - start new game
     showBettingModal(false);
   } else {
@@ -311,15 +328,13 @@ function handleNext() {
     gameState.currentCard = gameState.nextCard;
     gameState.nextCard = drawDifferentCard(gameState.currentCard);
     gameState.gameActive = true;
+    updateGuessButtons();
     
     resultMessageEl.textContent = "";
     resultMessageEl.className = "";
     nextCardEl.textContent = "?";
     dividerEl.classList.add("hidden");
     nextCardEl.classList.add("hidden");
-    
-    btnHigherEl.disabled = false;
-    btnLowerEl.disabled = false;
     btnNextEl.classList.add("hidden");
     btnCashoutEl.classList.add("hidden");
     
@@ -334,6 +349,16 @@ btnNextEl.addEventListener("click", handleNext);
 
 btnCashoutEl.addEventListener("click", handleCashout);
 btnExitEl.addEventListener("click", () => {
+  if (shouldBlockExitUntilCashout(gameState)) {
+    window.alert("You have winnings pending. Cash out first before exiting to home.");
+    return;
+  }
+
+  if (shouldConfirmExit(gameState)) {
+    const confirmed = window.confirm(buildExitWarningMessage(gameState.currentBet));
+    if (!confirmed) return;
+  }
+
   window.location.href = "index.html";
 });
 btnPlaceBetEl.addEventListener("click", handlePlaceBet);

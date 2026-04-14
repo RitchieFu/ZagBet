@@ -1,4 +1,4 @@
-import { resolveHiLoRound } from "./games/hilo.js";
+import { resolveHiLoRound, calculateWinProbability, calculateStepMultiplier, calculateCumulativeMultiplier, HOUSE_EDGE_FACTOR } from "./games/hilo.js";
 
 export const games = [
   {
@@ -28,4 +28,10 @@ export function getGameById(id) {
   return games.find((game) => game.id === id) ?? null;
 }
 
-export { resolveHiLoRound };
+export {
+  resolveHiLoRound,
+  calculateWinProbability,
+  calculateStepMultiplier,
+  calculateCumulativeMultiplier,
+  HOUSE_EDGE_FACTOR,
+};
