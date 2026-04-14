@@ -59,7 +59,7 @@ function hideObstacle() {
   obstacleEl.classList.remove("is-dropping");
   obstacleEl.style.transform = "";
   obstacleEl.style.display = "none";
-  obstacleEl.src = "";
+  obstacleEl.removeAttribute("src");
   obstacleEl.alt = "";
 }
 
