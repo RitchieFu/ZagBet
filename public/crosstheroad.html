@@ -116,7 +116,8 @@
       position: relative;
       width: 100%;
       flex: 1;
-      min-height: 17rem;
+      min-height: 15rem;
+      max-height: 15rem;
       border: 2px solid #8f96a3;
       border-radius: 12px;
       overflow: hidden;
@@ -126,8 +127,8 @@
       position: absolute;
       left: 0;
       right: 0;
-      bottom: 2.5rem;
-      height: 120px;
+      bottom: 24px;
+      height: 128px;
       overflow: hidden;
     }
     #road-lane {
@@ -141,14 +142,14 @@
     .road-tile {
       flex: 0 0 auto;
       width: 180px;
-      height: 120px;
+      height: 128px;
       user-select: none;
       pointer-events: none;
     }
     #obstacle {
       position: absolute;
-      left: 12%;
-      bottom: 10.9rem;
+      left: 55px;
+      bottom: 155px;
       width: 78px;
       height: auto;
       display: none;
@@ -157,12 +158,26 @@
       user-select: none;
       filter: drop-shadow(0 3px 3px rgba(0, 0, 0, 0.35));
     }
+    #obstacle.is-dropping {
+      animation: barrier-drop 280ms ease-out;
+    }
+    @keyframes barrier-drop {
+      0% {
+        transform: translateY(-52px);
+      }
+      60% {
+        transform: translateY(6px);
+      }
+      100% {
+        transform: translateY(0);
+      }
+    }
     #duck {
       position: absolute;
-      left: 12%;
-      bottom: 7.2rem;
+      left: 50px;
+      bottom: 50px;
+      width: 84px;
       max-height: 96px;
-      width: auto;
       display: block;
       transform-origin: center bottom;
       transition: transform 190ms ease-out;
@@ -174,9 +189,6 @@
       }
       .stats {
         grid-template-columns: 1fr 1fr;
-      }
-      .road-tile {
-        width: 150px;
       }
     }
   </style>

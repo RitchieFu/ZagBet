@@ -56,6 +56,8 @@ function setStatus(message) {
 
 function hideObstacle() {
   if (!obstacleEl) return;
+  obstacleEl.classList.remove("is-dropping");
+  obstacleEl.style.transform = "";
   obstacleEl.style.display = "none";
   obstacleEl.src = "";
   obstacleEl.alt = "";
@@ -63,19 +65,25 @@ function hideObstacle() {
 
 function showBarrierObstacle() {
   if (!obstacleEl) return;
+  obstacleEl.classList.remove("is-dropping");
   obstacleEl.src = "media/barrier.png";
   obstacleEl.alt = "Barrier";
   obstacleEl.style.display = "block";
   obstacleEl.style.width = "70px";
+  // Restart animation each safe jump so barrier drops in.
+  void obstacleEl.offsetWidth;
+  obstacleEl.classList.add("is-dropping");
 }
 
 function showCarObstacle() {
   if (!obstacleEl) return;
+  obstacleEl.classList.remove("is-dropping");
   const randomIndex = Math.floor(Math.random() * CAR_SPRITES.length);
   obstacleEl.src = CAR_SPRITES[randomIndex];
   obstacleEl.alt = "Car";
   obstacleEl.style.display = "block";
   obstacleEl.style.width = "96px";
+  obstacleEl.style.transform = "";
 }
 
 function carProbabilityForJump(jumpNumber) {
