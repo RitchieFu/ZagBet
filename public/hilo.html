@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HiLo — ZagBet</title>
+  <link rel="stylesheet" href="session.css">
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      background: #a1a9b6;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+      color: #1a1a1a;
+    }
+    .site-header {
+      padding: 1.25rem 1.5rem;
+      flex-shrink: 0;
+    }
+    .site-header h1 {
+      margin: 0;
+      font-size: clamp(1.75rem, 4vw, 2.5rem);
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      line-height: 1.05;
+    }
+    .zag {
+      color: #800020;
+    }
+    .bet {
+      color: #001f3f;
+    }
+    .play-area {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 0;
+      padding: 2rem 1.5rem;
+      gap: 2rem;
+    }
+    .card-display {
+      display: flex;
+      gap: 2rem;
+      align-items: center;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .card {
+      width: 120px;
+      height: 160px;
+      background: #fff;
+      border: 2px solid #e0dcd6;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2rem;
+      font-weight: bold;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.1);
+    }
+    .card.hidden {
+      background: linear-gradient(135deg, #800020, #001f3f);
+      color: transparent;
+      cursor: pointer;
+      transition: transform 0.2s ease;
+    }
+    .card.hidden:hover {
+      transform: scale(1.05);
+    }
+    .divider {
+      color: #999;
+      font-size: 1.5rem;
+      font-weight: bold;
+    }
+    .guess-buttons {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .btn {
+      padding: 0.75rem 1.5rem;
+      border: none;
+      border-radius: 6px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .btn-higher {
+      background: #800020;
+      color: #fff;
+    }
+    .btn-higher:hover:not(:disabled) {
+      background: #a01830;
+    }
+    .btn-lower {
+      background: #001f3f;
+      color: #fff;
+    }
+    .btn-lower:hover:not(:disabled) {
+      background: #002d5c;
+    }
+    .btn-next {
+      background: #4caf50;
+      color: #fff;
+    }
+    .btn-next:hover:not(:disabled) {
+      background: #45a049;
+    }
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    .btn:focus-visible {
+      outline: 3px solid #ffd700;
+      outline-offset: 3px;
+    }
+    .result-message {
+      font-size: 1.25rem;
+      font-weight: bold;
+      text-align: center;
+      min-height: 2rem;
+    }
+    .result-message.win {
+      color: #4caf50;
+    }
+    .result-message.lose {
+      color: #d32f2f;
+    }
+    .result-message.push {
+      color: #ff9800;
+    }
+    .score-display {
+      text-align: center;
+      font-size: 1.125rem;
+      font-weight: 600;
+    }
+    .hidden {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <h1><span class="zag">Zag</span><span class="bet">Bet</span></h1>
+    <div class="session-panel" id="session-panel" hidden>
+      <span class="session-panel__name" id="session-player-name"></span>
+      <span class="session-panel__balance" id="session-balance"></span>
+    </div>
+  </header>
+
+  <div class="play-area">
+    <div class="score-display">
+      <div id="round-info">Round 1</div>
+      <div id="streak-info"></div>
+    </div>
+
+    <div class="card-display">
+      <div class="card" id="current-card">?</div>
+      <div class="divider">vs</div>
+      <div class="card hidden" id="next-card">?</div>
+    </div>
+
+    <div class="guess-buttons" id="guess-buttons">
+      <button type="button" class="btn btn-higher" id="btn-higher">Higher</button>
+      <button type="button" class="btn btn-lower" id="btn-lower">Lower</button>
+    </div>
+
+    <div class="result-message" id="result-message"></div>
+
+    <button type="button" class="btn btn-next hidden" id="btn-next">Next Round</button>
+  </div>
+
+  <script type="module" src="session.js"></script>
+  <script type="module" src="hilo.page.js"></script>
+</body>
+</html>
