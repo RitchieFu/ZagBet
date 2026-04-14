@@ -39,35 +39,145 @@
       flex: 1;
       position: relative;
       min-height: 0;
+      padding: 1rem 1.5rem 6rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+    .game-panel {
+      width: min(100%, 52rem);
+      background: rgba(255, 255, 255, 0.75);
+      border: 2px solid #d6d6d6;
+      border-radius: 12px;
+      padding: 1rem;
+      display: grid;
+      gap: 0.75rem;
+    }
+    .controls {
+      display: grid;
+      grid-template-columns: minmax(8rem, 11rem) repeat(3, minmax(6rem, 9rem));
+      gap: 0.6rem;
+      align-items: end;
+    }
+    .controls label {
+      display: block;
+      font-size: 0.82rem;
+      font-weight: 700;
+      margin-bottom: 0.2rem;
+    }
+    .controls input {
+      width: 100%;
+      padding: 0.5rem 0.6rem;
+      font: inherit;
+      border: 2px solid #d6d6d6;
+      border-radius: 8px;
+    }
+    .controls input:focus-visible,
+    .game-btn:focus-visible {
+      outline: 3px solid #001f3f;
+      outline-offset: 2px;
+    }
+    .game-btn {
+      border: none;
+      border-radius: 8px;
+      padding: 0.58rem 0.9rem;
+      font: inherit;
+      font-weight: 700;
+      color: #fff;
+      cursor: pointer;
+    }
+    .game-btn:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+    }
+    #start {
+      background: #2e9f48;
+    }
+    #jump {
+      background: #c41e3a;
+    }
+    #cashout {
+      background: #001f3f;
+    }
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(7rem, 1fr));
+      gap: 0.4rem 0.8rem;
+      font-size: 0.95rem;
+      font-weight: 650;
+    }
+    .status-text {
+      min-height: 1.2rem;
+      margin: 0;
+      font-size: 0.92rem;
+      font-weight: 650;
+    }
+    .road-stage {
+      position: relative;
+      width: 100%;
+      flex: 1;
+      min-height: 17rem;
+      border: 2px solid #8f96a3;
+      border-radius: 12px;
+      overflow: hidden;
+      background: transparent;
+    }
+    .road-strip {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 2.5rem;
+      height: 120px;
+      overflow: hidden;
+    }
+    #road-lane {
+      position: absolute;
+      left: 0;
+      top: 0;
+      height: 100%;
+      display: flex;
+      will-change: transform;
+    }
+    .road-tile {
+      flex: 0 0 auto;
+      width: 180px;
+      height: 120px;
+      user-select: none;
+      pointer-events: none;
+    }
+    #obstacle {
+      position: absolute;
+      left: 12%;
+      bottom: 10.9rem;
+      width: 78px;
+      height: auto;
+      display: none;
+      z-index: 3;
+      pointer-events: none;
+      user-select: none;
+      filter: drop-shadow(0 3px 3px rgba(0, 0, 0, 0.35));
     }
     #duck {
       position: absolute;
-      left: 1.5rem;
-      bottom: 5.5rem;
+      left: 12%;
+      bottom: 7.2rem;
       max-height: 96px;
       width: auto;
       display: block;
-      transition: transform 0.2s ease-out;
+      transform-origin: center bottom;
+      transition: transform 190ms ease-out;
+      z-index: 2;
     }
-    #jump {
-      position: fixed;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      padding: 1rem 1.5rem;
-      border: none;
-      background: #c41e3a;
-      color: #fff;
-      font-size: 1.125rem;
-      font-weight: 700;
-      cursor: pointer;
-    }
-    #jump:hover {
-      background: #a01830;
-    }
-    #jump:focus-visible {
-      outline: 3px solid #001f3f;
-      outline-offset: -3px;
+    @media (max-width: 760px) {
+      .controls {
+        grid-template-columns: 1fr 1fr;
+      }
+      .stats {
+        grid-template-columns: 1fr 1fr;
+      }
+      .road-tile {
+        width: 150px;
+      }
     }
   </style>
 </head>
@@ -81,10 +191,33 @@
   </header>
 
   <div class="play-area">
-    <img id="duck" src="media/duck.png" alt="Duck">
-  </div>
+    <section class="game-panel" aria-label="Cross the road controls">
+      <div class="controls">
+        <div>
+          <label for="wager">Wager (USD)</label>
+          <input id="wager" type="number" min="1" step="1" value="25">
+        </div>
+        <button type="button" class="game-btn" id="start">Start</button>
+        <button type="button" class="game-btn" id="jump" disabled>Jump</button>
+        <button type="button" class="game-btn" id="cashout" disabled>Cash Out</button>
+      </div>
+      <div class="stats">
+        <span>Jumps: <strong id="jumps-value">0</strong></span>
+        <span>Multiplier: <strong id="multiplier-value">1.00x</strong></span>
+        <span>Payout: <strong id="payout-value">$0</strong></span>
+        <span>Car chance: <strong id="risk-value">0%</strong></span>
+      </div>
+      <p class="status-text" id="status-text" aria-live="polite">Enter a wager and press Start.</p>
+    </section>
 
-  <button type="button" id="jump">Jump</button>
+    <section class="road-stage" aria-label="Cross the road game">
+      <div class="road-strip">
+        <div id="road-lane"></div>
+      </div>
+      <img id="obstacle" src="" alt="">
+      <img id="duck" src="media/duck.png" alt="Duck">
+    </section>
+  </div>
 
   <script type="module" src="session.js"></script>
   <script type="module" src="crosstheroad.page.js"></script>
