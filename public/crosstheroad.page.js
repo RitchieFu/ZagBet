@@ -1,10 +1,6 @@
-const TILE_WIDTH = 180;
-const MAX_MULTIPLIER = 8.0;
+export const TILE_WIDTH = 180;
+export const MAX_MULTIPLIER = 8.0;
 
-const duckEl = document.getElementById("duck");
-const obstacleEl = document.getElementById("obstacle");
-const roadLaneEl = document.getElementById("road-lane");
-const roadStripEl = roadLaneEl?.parentElement ?? null;
 const CAR_SPRITES = [
   "media/black_car.png",
   "media/blue_car.png",
@@ -14,16 +10,48 @@ const CAR_SPRITES = [
   "media/red_car.png",
 ];
 
-const wagerEl = document.getElementById("wager");
-const startBtn = document.getElementById("start");
-const jumpBtn = document.getElementById("jump");
-const cashoutBtn = document.getElementById("cashout");
-const statusEl = document.getElementById("status-text");
+/** @type {HTMLImageElement | null} */
+let duckEl = null;
+/** @type {HTMLImageElement | null} */
+let obstacleEl = null;
+/** @type {HTMLDivElement | null} */
+let roadLaneEl = null;
+/** @type {HTMLElement | null} */
+let roadStripEl = null;
+/** @type {HTMLInputElement | null} */
+let wagerEl = null;
+/** @type {HTMLButtonElement | null} */
+let startBtn = null;
+/** @type {HTMLButtonElement | null} */
+let jumpBtn = null;
+/** @type {HTMLButtonElement | null} */
+let cashoutBtn = null;
+/** @type {HTMLElement | null} */
+let statusEl = null;
+/** @type {HTMLElement | null} */
+let jumpsValueEl = null;
+/** @type {HTMLElement | null} */
+let multiplierValueEl = null;
+/** @type {HTMLElement | null} */
+let payoutValueEl = null;
+/** @type {HTMLElement | null} */
+let riskValueEl = null;
 
-const jumpsValueEl = document.getElementById("jumps-value");
-const multiplierValueEl = document.getElementById("multiplier-value");
-const payoutValueEl = document.getElementById("payout-value");
-const riskValueEl = document.getElementById("risk-value");
+function wireDom() {
+  duckEl = document.getElementById("duck");
+  obstacleEl = document.getElementById("obstacle");
+  roadLaneEl = document.getElementById("road-lane");
+  roadStripEl = roadLaneEl?.parentElement ?? null;
+  wagerEl = document.getElementById("wager");
+  startBtn = document.getElementById("start");
+  jumpBtn = document.getElementById("jump");
+  cashoutBtn = document.getElementById("cashout");
+  statusEl = document.getElementById("status-text");
+  jumpsValueEl = document.getElementById("jumps-value");
+  multiplierValueEl = document.getElementById("multiplier-value");
+  payoutValueEl = document.getElementById("payout-value");
+  riskValueEl = document.getElementById("risk-value");
+}
 
 /** @typedef {"idle" | "running" | "lost" | "cashedOut"} RunState */
 
@@ -262,11 +290,23 @@ function initializeGame() {
   setStatus("Enter a wager and press Start.");
 }
 
-startBtn?.addEventListener("click", tryStartRun);
-jumpBtn?.addEventListener("click", () => {
-  void handleJump();
-});
-cashoutBtn?.addEventListener("click", handleCashout);
-window.addEventListener("resize", ensureRoadTiles);
+function attachUiHandlers() {
+  startBtn?.addEventListener("click", tryStartRun);
+  jumpBtn?.addEventListener("click", () => {
+    void handleJump();
+  });
+  cashoutBtn?.addEventListener("click", handleCashout);
+  globalThis.window?.addEventListener("resize", ensureRoadTiles);
+}
 
-initializeGame();
+function boot() {
+  wireDom();
+  attachUiHandlers();
+  initializeGame();
+}
+
+if (typeof document !== "undefined") {
+  boot();
+}
+
+export { formatUsd, carProbabilityForJump, multiplierForJumps };
