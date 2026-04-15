@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HiLo — ZagBet</title>
+  <link rel="stylesheet" href="session.css">
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      background: #a1a9b6;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+      color: #1a1a1a;
+    }
+    .site-header {
+      padding: 1.25rem 1.5rem;
+      flex-shrink: 0;
+    }
+    .site-header h1 {
+      margin: 0;
+      font-size: clamp(1.75rem, 4vw, 2.5rem);
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      line-height: 1.05;
+    }
+    .zag {
+      color: #800020;
+    }
+    .bet {
+      color: #001f3f;
+    }
+    .play-area {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 0;
+      padding: 2rem 1.5rem;
+      gap: 2rem;
+    }
+    .card-display {
+      display: flex;
+      gap: 2rem;
+      align-items: center;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .card {
+      width: 120px;
+      height: 160px;
+      background: #fff;
+      border: 2px solid #e0dcd6;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2rem;
+      font-weight: bold;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.1);
+    }
+    .card.hidden {
+      background: linear-gradient(135deg, #800020, #001f3f);
+      color: transparent;
+      cursor: pointer;
+      transition: transform 0.2s ease;
+    }
+    .card.hidden:hover {
+      transform: scale(1.05);
+    }
+    .divider {
+      color: #999;
+      font-size: 1.5rem;
+      font-weight: bold;
+    }
+    .guess-buttons {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .btn {
+      padding: 0.75rem 1.5rem;
+      border: none;
+      border-radius: 6px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .btn-higher {
+      background: #800020;
+      color: #fff;
+    }
+    .btn-higher:hover:not(:disabled) {
+      background: #a01830;
+    }
+    .btn-lower {
+      background: #001f3f;
+      color: #fff;
+    }
+    .btn-lower:hover:not(:disabled) {
+      background: #002d5c;
+    }
+    .btn-next {
+      background: #4caf50;
+      color: #fff;
+    }
+    .btn-next:hover:not(:disabled) {
+      background: #45a049;
+    }
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    .btn:focus-visible {
+      outline: 3px solid #ffd700;
+      outline-offset: 3px;
+    }
+    .result-message {
+      font-size: 1.25rem;
+      font-weight: bold;
+      text-align: center;
+      min-height: 2rem;
+    }
+    .result-message.win {
+      color: #4caf50;
+    }
+    .result-message.lose {
+      color: #d32f2f;
+    }
+    .result-message.push {
+      color: #ff9800;
+    }
+    .score-display {
+      text-align: center;
+      font-size: 1.125rem;
+      font-weight: 600;
+    }
+    .hidden {
+      display: none;
+    }
+    .game-info {
+      display: flex;
+      gap: 2rem;
+      justify-content: center;
+      flex-wrap: wrap;
+      align-items: center;
+      font-weight: 600;
+    }
+    .game-info-item {
+      text-align: center;
+    }
+    .game-info-label {
+      display: block;
+      font-size: 0.875rem;
+      color: #666;
+      margin-bottom: 0.25rem;
+    }
+    .game-info-value {
+      display: block;
+      font-size: 1.5rem;
+      color: #001f3f;
+    }
+    .game-info-value.multiplier {
+      color: #800020;
+    }
+    .game-controls {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin-top: 1rem;
+    }
+
+    .btn-cashout {
+      background: #4caf50;
+      color: #fff;
+    }
+    .btn-cashout:hover:not(:disabled) {
+      background: #45a049;
+    }
+    .btn-exit {
+      background: #666;
+      color: #fff;
+    }
+    .btn-exit:hover:not(:disabled) {
+      background: #555;
+    }
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+      background: rgba(0, 0, 0, 0.5);
+    }
+    .modal-overlay.hidden {
+      display: none;
+    }
+    .betting-modal {
+      width: min(100%, 28rem);
+      padding: 2rem;
+      border-radius: 12px;
+      background: #fff;
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.2);
+    }
+    .betting-modal h2 {
+      margin: 0 0 1rem;
+      font-size: 1.5rem;
+    }
+    .bet-form {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+    .form-group label {
+      font-weight: 600;
+      font-size: 0.95rem;
+    }
+    .form-group input {
+      padding: 0.75rem;
+      border: 2px solid #e0dcd6;
+      border-radius: 6px;
+      font-size: 1rem;
+    }
+    .form-group input:focus-visible {
+      outline: 3px solid #001f3f;
+      outline-offset: 1px;
+    }
+    .balance-info {
+      padding: 0.75rem;
+      background: #f5f5f5;
+      border-radius: 6px;
+      font-size: 0.9rem;
+      text-align: center;
+    }
+    .error-message {
+      color: #d32f2f;
+      font-size: 0.9rem;
+    }
+    .bet-buttons {
+      display: flex;
+      gap: 0.75rem;
+      margin-top: 1rem;
+    }
+    .bet-buttons button {
+      flex: 1;
+    }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <h1><span class="zag">Zag</span><span class="bet">Bet</span></h1>
+    <div class="session-panel" id="session-panel" hidden>
+      <span class="session-panel__name" id="session-player-name"></span>
+      <span class="session-panel__balance" id="session-balance"></span>
+    </div>
+  </header>
+
+  <div class="play-area">
+    <div class="score-display">
+      <div id="round-info">Round 1</div>
+      <div id="streak-info"></div>
+    </div>
+
+    <div class="game-info">
+      <div class="game-info-item">
+        <span class="game-info-label">Bet</span>
+        <span class="game-info-value" id="current-bet">$0</span>
+      </div>
+      <div class="game-info-item">
+        <span class="game-info-label">Multiplier</span>
+        <span class="game-info-value multiplier" id="multiplier">1.00x</span>
+      </div>
+      <div class="game-info-item">
+        <span class="game-info-label">Winnings</span>
+        <span class="game-info-value" id="current-winnings">$0</span>
+      </div>
+    </div>
+
+    <div class="card-display">
+      <div class="card" id="current-card">?</div>
+       <div class="divider hidden" id="divider">vs</div>
+      <div class="card hidden" id="next-card">?</div>
+    </div>
+
+    <div class="guess-buttons" id="guess-buttons">
+      <button type="button" class="btn btn-higher" id="btn-higher">Higher</button>
+      <button type="button" class="btn btn-lower" id="btn-lower">Lower</button>
+    </div>
+
+    <div class="result-message" id="result-message"></div>
+
+    <div class="game-controls">
+      <button type="button" class="btn btn-next hidden" id="btn-next">Next Round</button>
+      <button type="button" class="btn btn-cashout hidden" id="btn-cashout">Cash Out</button>
+      <button type="button" class="btn btn-exit" id="btn-exit">Exit to Home</button>
+    </div>
+  </div>
+
+  <!-- Betting Modal -->
+  <div class="modal-overlay hidden" id="betting-modal-overlay">
+    <div class="betting-modal">
+      <h2 id="betting-title">Place Your Bet</h2>
+      <div class="bet-form">
+        <div class="balance-info">
+          <strong>Available Balance:</strong> <span id="modal-balance">$0</span>
+        </div>
+        <div class="form-group">
+          <label for="bet-amount">Bet Amount</label>
+          <input 
+            type="number" 
+            id="bet-amount" 
+            min="1" 
+            step="1" 
+            placeholder="Enter amount"
+            autocomplete="off"
+          >
+        </div>
+        <div class="error-message" id="bet-error"></div>
+        <div class="bet-buttons">
+          <button type="button" class="btn btn-lower" id="btn-cancel-bet">Cancel</button>
+          <button type="button" class="btn btn-higher" id="btn-place-bet">Place Bet</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="session.js"></script>
+  <script type="module" src="hilo.page.js"></script>
+</body>
+</html>
