@@ -1,5 +1,5 @@
-const GRID_SIZE = 5;
-const GRID_CELLS = GRID_SIZE * GRID_SIZE;
+export const GRID_SIZE = 5;
+export const GRID_CELLS = GRID_SIZE * GRID_SIZE;
 const MIN_MINES = 1;
 const MAX_MINES = 20;
 const DEFAULT_MINES = 3;
@@ -8,7 +8,7 @@ const MIN_BET = 1;
 const MINE_FADE_MS = 300;
 const PAUSE_AFTER_MINES_MS = 250;
 const SAFE_FADE_MS = 300;
-const HOUSE_EDGE = 0.95;
+export const HOUSE_EDGE = 0.95;
 
 /** All classes a cell can pick up from gameplay; strip these to reset or before repainting. */
 const CELL_STATE = [
@@ -29,28 +29,33 @@ const game = {
   cumulativeMultiplier: 1,
 };
 
-function nextStepMultiplier(numMines, safeRevealed) {
+export function nextStepMultiplier(numMines, safeRevealed) {
   const cellsLeft = GRID_CELLS - safeRevealed;
   const safeLeft = GRID_CELLS - numMines - safeRevealed;
   if (safeLeft <= 0 || cellsLeft <= 0) return NaN;
   return HOUSE_EDGE * (cellsLeft / safeLeft);
 }
 
-function formatMultiplierDisplay(value) {
+export function formatMultiplierDisplay(value) {
   if (!Number.isFinite(value) || value <= 0) return "×—";
   return `×${value.toFixed(4).replace(/\.?0+$/, "")}`;
 }
 
-function pickMineIndices(count) {
+/**
+ * @param {number} count
+ * @param {() => number} [random] Returns values in [0, 1); defaults to Math.random.
+ */
+export function pickMineIndices(count, random = Math.random) {
   const order = Array.from({ length: GRID_CELLS }, (_, i) => i);
   for (let i = order.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
+    const j = Math.floor(random() * (i + 1));
     [order[i], order[j]] = [order[j], order[i]];
   }
   return new Set(order.slice(0, count));
 }
 
-function truncateMoney2(amount) {
+export function computeTotalWinnings(stake, cumulativeMultiplier) {
+  const amount = stake * cumulativeMultiplier;
   return Number.isFinite(amount) ? Math.trunc(amount * 100) / 100 : 0;
 }
 
@@ -108,7 +113,7 @@ function updateNextMultiplierDisplay(select, multEl) {
 }
 
 function totalWinnings() {
-  return truncateMoney2(game.stake * game.cumulativeMultiplier);
+  return computeTotalWinnings(game.stake, game.cumulativeMultiplier);
 }
 
 function resetToIdleUI(ctx, clearBoard) {
@@ -327,5 +332,7 @@ function initMinesGame(refs) {
   });
 }
 
-const layoutRefs = initMinesLayout();
-initMinesGame(layoutRefs);
+if (typeof document !== "undefined") {
+  const layoutRefs = initMinesLayout();
+  initMinesGame(layoutRefs);
+}
