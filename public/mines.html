@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mines — ZagBet</title>
+  <link rel="stylesheet" href="session.css">
+  <link rel="stylesheet" href="site.css">
+  <style>
+    .play-area {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+    }
+    .mines-panel {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.25rem;
+      width: min(100%, 22rem);
+    }
+    .mines-panel__bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0;
+      width: 100%;
+      align-self: stretch;
+    }
+    .mines-controls {
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      margin: 0;
+    }
+    .mines-multiplier-wrap {
+      display: inline-flex;
+      align-items: baseline;
+      gap: 0.25rem;
+      margin: 0;
+      flex-shrink: 0;
+      font-size: 1rem;
+      line-height: 1.2;
+      padding: 0.35rem 0.55rem;
+      background: #f5d547;
+      border-radius: 8px;
+    }
+    .mines-multiplier__label {
+      font-weight: 600;
+      color: #1a1a1a;
+    }
+    .mines-multiplier {
+      margin: 0;
+      font-weight: 700;
+      color: #001f3f;
+      font-variant-numeric: tabular-nums;
+    }
+    .mines-controls label {
+      font-weight: 600;
+    }
+    .mines-controls select {
+      min-width: 5rem;
+      padding: 0.35rem 0.5rem;
+      font-size: 1rem;
+      border: 1px solid #5a6270;
+      border-radius: 4px;
+      background: #fff;
+    }
+    .mines-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      grid-template-rows: repeat(5, 1fr);
+      gap: 4px;
+      width: min(100%, 20rem);
+      aspect-ratio: 1;
+    }
+    .mines-cell {
+      min-height: 0;
+      min-width: 0;
+      border-radius: 4px;
+      border: 2px solid #5a6270;
+      background: #c8cdd6;
+      transition: opacity 0.4s ease, background-color 0.35s ease, border-color 0.35s ease;
+    }
+    .mines-cell--fade-mine {
+      opacity: 0;
+      background-color: #c41e3a;
+      border-color: #800020;
+    }
+    .mines-cell--fade-mine.mines-cell--fade-mine-visible {
+      opacity: 1;
+    }
+    .mines-cell--fade-safe {
+      opacity: 0;
+      background-color: #2e7d32;
+      border-color: #1b5e20;
+    }
+    .mines-cell--fade-safe.mines-cell--fade-safe-visible {
+      opacity: 1;
+    }
+    .mines-grid--active .mines-cell:not(.mines-cell--revealed-safe):not(.mines-cell--revealed-mine) {
+      cursor: pointer;
+    }
+    .mines-grid--active .mines-cell:not(.mines-cell--revealed-safe):not(.mines-cell--revealed-mine):hover {
+      filter: brightness(1.06);
+    }
+    .mines-cell--revealed-safe {
+      background: #2e7d32;
+      border-color: #1b5e20;
+    }
+    .mines-cell--revealed-mine {
+      background: #c41e3a;
+      border-color: #800020;
+    }
+    .mines-grid--blocked .mines-cell {
+      pointer-events: none;
+      cursor: default;
+    }
+    .mines-bet-row {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      width: 100%;
+      flex-wrap: wrap;
+    }
+    .mines-bet-row__label {
+      flex-shrink: 0;
+      font-weight: 600;
+    }
+    .mines-bet-row input[type="number"] {
+      width: 7.25rem;
+      max-width: 100%;
+      padding: 0.45rem 0.5rem;
+      font-size: 1rem;
+      border: 1px solid #5a6270;
+      border-radius: 4px;
+      text-align: center;
+      -moz-appearance: textfield;
+      appearance: textfield;
+    }
+    .mines-bet-row input[type="number"]::-webkit-outer-spin-button,
+    .mines-bet-row input[type="number"]::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+    .mines-bet-row button {
+      flex-shrink: 0;
+      margin-left: auto;
+      padding: 0.5rem 1.25rem;
+      font-size: 1rem;
+      font-weight: 700;
+      border: none;
+      border-radius: 4px;
+      background: #c41e3a;
+      color: #fff;
+      cursor: pointer;
+    }
+    .mines-bet-row button:hover {
+      background: #a01830;
+    }
+    .mines-bet-row button:focus-visible {
+      outline: 3px solid #001f3f;
+      outline-offset: 2px;
+    }
+    .mines-bet-row button.mines-bet-row__btn--cashout {
+      background: #2e7d32;
+    }
+    .mines-bet-row button.mines-bet-row__btn--cashout:hover {
+      background: #1b5e20;
+    }
+    .mines-bet-row button.mines-bet-row__btn--cashout:focus-visible {
+      outline-color: #800020;
+    }
+    .mines-bet-error {
+      align-self: stretch;
+      margin: 0;
+      min-height: 1.25rem;
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: #a01830;
+      text-align: center;
+    }
+    .mines-bet-error[hidden] {
+      display: none !important;
+    }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <h1><a class="site-header__logo" href="index.html"><span class="zag">Zag</span><span class="bet">Bet</span></a></h1>
+    <div class="session-panel" id="session-panel" hidden>
+      <span class="session-panel__name" id="session-player-name"></span>
+      <span class="session-panel__balance" id="session-balance"></span>
+    </div>
+  </header>
+
+  <div class="play-area">
+  <div class="mines-panel">
+    <div class="mines-panel__bar">
+      <div class="mines-controls">
+        <label for="mine-count">Mines</label>
+        <select id="mine-count" name="mine-count" aria-label="Number of mines"></select>
+      </div>
+      <div class="mines-multiplier-wrap" aria-live="polite">
+        <span class="mines-multiplier__label">Next:</span>
+        <span class="mines-multiplier" id="mines-multiplier">×—</span>
+      </div>
+    </div>
+
+    <div class="mines-grid" id="mines-grid" role="grid" aria-label="Mines game board"></div>
+
+    <div class="mines-bet-row">
+      <label class="mines-bet-row__label" id="mines-bet-label" for="bet-amount">Bet amount:</label>
+      <input
+        id="bet-amount"
+        name="bet-amount"
+        type="number"
+        min="1"
+        step="0.01"
+        value="1.00"
+        inputmode="decimal"
+      >
+      <button type="button" id="mines-bet-button">BET</button>
+    </div>
+    <p class="mines-bet-error" id="mines-bet-error" role="alert" hidden></p>
+  </div>
+  </div>
+
+  <script type="module" src="session.js"></script>
+  <script type="module" src="mines.page.js"></script>
+</body>
+</html>
