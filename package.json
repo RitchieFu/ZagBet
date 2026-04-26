@@ -4,11 +4,9 @@
   "version": "0.1.0",
   "type": "module",
   "scripts": {
-    "lint": "find src test -name '*.js' -print0 | xargs -0 -n1 node --check",
+    "lint": "node -e \"const { readdirSync, statSync } = require('node:fs'); const { join } = require('node:path'); const { spawnSync } = require('node:child_process'); const roots = ['public', 'test']; const files = []; const walk = (dir) => { for (const name of readdirSync(dir)) { const fullPath = join(dir, name); const stats = statSync(fullPath); if (stats.isDirectory()) walk(fullPath); else if (fullPath.endsWith('.js')) files.push(fullPath); } }; roots.forEach(walk); for (const file of files) { const result = spawnSync(process.execPath, ['--check', file], { stdio: 'inherit' }); if (result.status !== 0) process.exit(result.status ?? 1); }\"",
     "test": "node --test",
-    "build": "node scripts/build.mjs",
-    "play": "node bin/play.mjs",
-    "play:crosstheroad": "node bin/playcrosstheroad.mjs"
+    "validate:html": "npx html-validate public/*.html"
   },
   "devDependencies": {
     "html-validate": "^10.11.3"
