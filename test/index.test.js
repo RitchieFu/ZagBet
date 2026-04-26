@@ -1,16 +1,21 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { games, getGameById } from "../src/index.js";
+import { readFile } from "node:fs/promises";
 
-test("game catalog includes all minigames", () => {
-  assert.equal(games.length, 3);
-  assert.deepEqual(games.map((game) => game.id), ["hilo", "cross-the-road", "mines"]);
+const INDEX_HTML_PATH = new URL("../public/index.html", import.meta.url);
+
+test("home page links to all game pages", async () => {
+  const indexHtml = await readFile(INDEX_HTML_PATH, "utf8");
+
+  assert.match(indexHtml, /href="hilo\.html"/);
+  assert.match(indexHtml, /href="crosstheroad\.html"/);
+  assert.match(indexHtml, /href="mines\.html"/);
 });
 
-test("getGameById returns matching game", () => {
-  assert.equal(getGameById("mines")?.name, "Mines");
-});
+test("home page includes all game card titles", async () => {
+  const indexHtml = await readFile(INDEX_HTML_PATH, "utf8");
 
-test("getGameById returns null for unknown ids", () => {
-  assert.equal(getGameById("unknown"), null);
+  assert.match(indexHtml, />HiLo</);
+  assert.match(indexHtml, />Cross The Road</);
+  assert.match(indexHtml, />Mines</);
 });

@@ -1,15 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { games, getGameById, resolveHiLoRound } from "../src/index.js";
-import { buildExitWarningMessage, calculateCumulativeMultiplier, calculateStepMultiplier, calculateWinProbability, getCardLabel, HOUSE_EDGE_FACTOR, shouldBlockExitUntilCashout, shouldConfirmExit } from "../src/games/hilo.js";
-
-test("HiLo game stays in the catalog as the active baseline", () => {
-  const hilo = getGameById("hilo");
-
-  assert.equal(games.length, 3);
-  assert.equal(hilo?.status, "active");
-  assert.equal(hilo?.entrypoint, "src/games/hilo.js");
-});
+import { buildExitWarningMessage, calculateCumulativeMultiplier, calculateStepMultiplier, calculateWinProbability, getCardLabel, HOUSE_EDGE_FACTOR, resolveHiLoRound, shouldBlockExitUntilCashout, shouldConfirmExit } from "../public/hilo.page.js";
 
 test("resolveHiLoRound returns win, lose, or push", () => {
   assert.deepEqual(resolveHiLoRound(7, 10, "higher"), {
