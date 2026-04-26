@@ -1,32 +1,107 @@
 /**
  * HiLo game UI for browser play with betting.
  */
-import { resolveHiLoRound, getCardLabel, calculateStepMultiplier, calculateCumulativeMultiplier, buildExitWarningMessage, shouldConfirmExit, shouldBlockExitUntilCashout } from "./games/hilo.js";
+export const HOUSE_EDGE_FACTOR = 0.97;
 
-const currentCardEl = document.getElementById("current-card");
-const nextCardEl = document.getElementById("next-card");
-const dividerEl = document.getElementById("divider");
-const btnHigherEl = document.getElementById("btn-higher");
-const btnLowerEl = document.getElementById("btn-lower");
-const btnNextEl = document.getElementById("btn-next");
-const btnCashoutEl = document.getElementById("btn-cashout");
-const btnExitEl = document.getElementById("btn-exit");
-const resultMessageEl = document.getElementById("result-message");
-const roundInfoEl = document.getElementById("round-info");
-const streakInfoEl = document.getElementById("streak-info");
-const guessButtonsEl = document.getElementById("guess-buttons");
+const CARD_NAMES = {
+  1: "Ace",
+  11: "Jack",
+  12: "Queen",
+  13: "King",
+};
 
-const bettingModalOverlay = document.getElementById("betting-modal-overlay");
-const bettingTitleEl = document.getElementById("betting-title");
-const betAmountInput = document.getElementById("bet-amount");
-const modalBalanceEl = document.getElementById("modal-balance");
-const betErrorEl = document.getElementById("bet-error");
-const btnPlaceBetEl = document.getElementById("btn-place-bet");
-const btnCancelBetEl = document.getElementById("btn-cancel-bet");
+export function getCardLabel(value) {
+  if (!Number.isInteger(value) || value < 1 || value > 13) {
+    throw new RangeError("Card value must be an integer from 1 to 13.");
+  }
+  return CARD_NAMES[value] ?? String(value);
+}
 
-const currentBetEl = document.getElementById("current-bet");
-const multiplierEl = document.getElementById("multiplier");
-const currentWinningsEl = document.getElementById("current-winnings");
+export function resolveHiLoRound(currentCard, nextCard, guess) {
+  if (!Number.isInteger(currentCard) || !Number.isInteger(nextCard)) {
+    throw new TypeError("Card values must be integers.");
+  }
+  if (currentCard < 1 || currentCard > 13 || nextCard < 1 || nextCard > 13) {
+    throw new RangeError("Card values must be between 1 and 13.");
+  }
+  if (guess !== "higher" && guess !== "lower") {
+    throw new TypeError('Guess must be "higher" or "lower".');
+  }
+  if (nextCard === currentCard) {
+    return { result: "push", outcome: "equal", currentCard, nextCard, guess };
+  }
+  const outcome = nextCard > currentCard ? "higher" : "lower";
+  return { result: outcome === guess ? "win" : "lose", outcome, currentCard, nextCard, guess };
+}
+
+export function calculateWinProbability(currentCard, guess, remainingDeck) {
+  if (!Number.isInteger(currentCard) || currentCard < 1 || currentCard > 13) {
+    throw new RangeError("Current card must be an integer between 1 and 13.");
+  }
+  if (guess !== "higher" && guess !== "lower") {
+    throw new TypeError('Guess must be "higher" or "lower".');
+  }
+  if (!Array.isArray(remainingDeck) || remainingDeck.length === 0) return 0;
+  const wins = remainingDeck.filter((card) =>
+    guess === "higher" ? card > currentCard : card < currentCard,
+  ).length;
+  return wins / remainingDeck.length;
+}
+
+export function calculateStepMultiplier(currentCard, guess, remainingDeck) {
+  const probability = calculateWinProbability(currentCard, guess, remainingDeck);
+  if (!Number.isFinite(probability) || probability <= 0) return 0;
+  return (1 / probability) * HOUSE_EDGE_FACTOR;
+}
+
+export function calculateCumulativeMultiplier(stepResults) {
+  if (!Array.isArray(stepResults) || stepResults.length === 0) return 1;
+  return stepResults.reduce((acc, step) => {
+    const stepMultiplier = Number(step?.stepMultiplier);
+    if (!Number.isFinite(stepMultiplier) || stepMultiplier <= 0) return acc;
+    return acc * stepMultiplier;
+  }, 1);
+}
+
+export function buildExitWarningMessage(currentBet) {
+  return `Are you sure? You will lose your bet of $${Math.round(currentBet)}.`;
+}
+
+export function shouldConfirmExit(gameState) {
+  if (!gameState || typeof gameState !== "object") return false;
+  return Boolean(gameState.gameActive) && Number(gameState.currentBet) > 0;
+}
+
+export function shouldBlockExitUntilCashout(gameState) {
+  if (!gameState || typeof gameState !== "object") return false;
+  return Number(gameState.currentWinnings) > 0;
+}
+
+const doc = globalThis.document;
+const currentCardEl = doc?.getElementById("current-card");
+const nextCardEl = doc?.getElementById("next-card");
+const dividerEl = doc?.getElementById("divider");
+const btnHigherEl = doc?.getElementById("btn-higher");
+const btnLowerEl = doc?.getElementById("btn-lower");
+const btnNextEl = doc?.getElementById("btn-next");
+const btnCashoutEl = doc?.getElementById("btn-cashout");
+const btnExitEl = doc?.getElementById("btn-exit");
+const resultMessageEl = doc?.getElementById("result-message");
+const roundInfoEl = doc?.getElementById("round-info");
+const streakInfoEl = doc?.getElementById("streak-info");
+const guessButtonsEl = doc?.getElementById("guess-buttons");
+
+const bettingModalOverlay = doc?.getElementById("betting-modal-overlay");
+const bettingTitleEl = doc?.getElementById("betting-title");
+const betAmountInput = doc?.getElementById("bet-amount");
+const modalBalanceEl = doc?.getElementById("modal-balance");
+const betErrorEl = doc?.getElementById("bet-error");
+const btnPlaceBetEl = doc?.getElementById("btn-place-bet");
+const btnCancelBetEl = doc?.getElementById("btn-cancel-bet");
+
+const currentBetEl = doc?.getElementById("current-bet");
+const multiplierEl = doc?.getElementById("multiplier");
+const currentWinningsEl = doc?.getElementById("current-winnings");
 
 function formatUsd(amount) {
   return new Intl.NumberFormat("en-US", {
@@ -343,12 +418,12 @@ function handleNext() {
 }
 
 // Event listeners
-btnHigherEl.addEventListener("click", () => handleGuess("higher"));
-btnLowerEl.addEventListener("click", () => handleGuess("lower"));
-btnNextEl.addEventListener("click", handleNext);
+btnHigherEl?.addEventListener("click", () => handleGuess("higher"));
+btnLowerEl?.addEventListener("click", () => handleGuess("lower"));
+btnNextEl?.addEventListener("click", handleNext);
 
-btnCashoutEl.addEventListener("click", handleCashout);
-btnExitEl.addEventListener("click", () => {
+btnCashoutEl?.addEventListener("click", handleCashout);
+btnExitEl?.addEventListener("click", () => {
   if (shouldBlockExitUntilCashout(gameState)) {
     window.alert("You have winnings pending. Cash out first before exiting to home.");
     return;
@@ -361,10 +436,10 @@ btnExitEl.addEventListener("click", () => {
 
   window.location.href = "index.html";
 });
-btnPlaceBetEl.addEventListener("click", handlePlaceBet);
-btnCancelBetEl.addEventListener("click", handleCancelBet);
+btnPlaceBetEl?.addEventListener("click", handlePlaceBet);
+btnCancelBetEl?.addEventListener("click", handleCancelBet);
 
-betAmountInput.addEventListener("keydown", (e) => {
+betAmountInput?.addEventListener("keydown", (e) => {
   if (e.key === "Enter") {
     e.preventDefault();
     handlePlaceBet();
@@ -383,4 +458,6 @@ function waitForSessionAndInit() {
 }
 
 // Initialize
-waitForSessionAndInit();
+if (typeof document !== "undefined") {
+  waitForSessionAndInit();
+}
